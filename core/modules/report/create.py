@@ -24,7 +24,7 @@ def create(data):
             for k, v in content.items():
                 text.textLine(f"        {k}: {v}")
         else:
-            text.textLine(content)
+            text.textLine(f"        {content}")
         text.textLine("")
 
     for sec in data:
