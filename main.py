@@ -1,0 +1,127 @@
+import json, tls_client
+from core.modules.report.create import create
+
+# Bank
+from core.modules.bank.bincheck import bincheck
+
+# Email
+
+# Identity
+
+from core.modules.identity.namelog import namelog
+
+# IP
+from core.modules.ip.lookup import lookup
+from core.modules.ip.getbanner import get_banner
+from core.modules.ip.known_vpn import known_vpn
+
+# Online
+
+# Phone
+
+
+
+class Main:
+    def __init__(self):
+        self.session = tls_client.Session()
+        self.modules = [
+            {
+                "name" : "Bank",
+                "arg" : "Bin",
+                "funcs" : [
+                    {
+                        "name" : "Bincheck",
+                        "func" : bincheck,
+                        "args" : ["Bin"],
+                        "report_key" : "BIN_RESULT"
+                    }
+                ]
+            },
+            {
+                "name" : "Email",
+                "arg" : "Email",
+                "funcs" : []
+            },
+            {
+                "name" : "Identity",
+                "arg" : "Identity",
+                "funcs" : [
+                    {
+                        "name" : "Namelog",
+                        "func" : namelog,
+                        "args" : ["First Name", "Last Name"],
+                        "report_key" : "NAME"
+                    }
+                ]
+            },
+            {
+                "name" : "IP",
+                "arg" : "Ip",
+                "funcs" : [
+                    {
+                        "name" : "Lookup",
+                        "func" : lookup,
+                        "args" : ["Ip"],
+                        "report_key" : "IP_LOOKUP_RESULT"
+                    },
+                    {
+                        "name" : "Banner",
+                        "func" : get_banner,
+                        "args" : ["Ip", "Port"],
+                        "report_key" : "IP_BANNER_RESULT"
+                    },
+                    {
+                        "name" : "Known VPN",
+                        "func" : known_vpn,
+                        "args" : ["Ip"],
+                        "report_key" : "KNOWN_VPN_RESULT"
+                    }
+                ]
+            }
+        ]
+        self.report = {}
+
+    def setup(self):
+        info_config = {}
+        for mod in self.modules:
+            self.report[mod["name"]] = {}
+            print("[ {}".format(mod["name"]))
+            info_config[mod["name"]] = {}
+            info_config[mod["name"]]["funcs"] = []
+            for func in mod["funcs"]:
+                info_config[mod["name"]]["funcs"].append({
+                    "name" : func["name"],
+                    "func" : func["func"],
+                    "mod"  : mod["name"],
+                    "args" : []
+                })
+                print("| ARGS FOR {}".format(func["name"]))
+                for arg in func["args"]:
+                    input_arg = input(f"[ {arg} : ")
+                    if input_arg:
+                        info_config[mod["name"]]["funcs"][-1]["args"].append(input_arg)
+        return info_config
+    
+    def run(self, info_config):
+        for mod in info_config:
+            module_data = info_config[mod]
+            for func in module_data["funcs"]:
+                if func["args"] == []:
+                    print("Skipping {}".format(func["name"]))
+                    continue
+                print("Running {}".format(func["name"]))
+                func_name = func["name"]
+                args      = func["args"]
+                func_func = func["func"]
+                self.report[mod][func_name] = func_func(self, self.session, *args)
+
+    def main(self):
+        data = self.setup()
+        self.run(data)
+
+        print(self.report)
+        create(self.report)
+
+if __name__ == "__main__":
+    main = Main()
+    main.main()
