@@ -16,6 +16,7 @@ from core.modules.ip.getbanner import get_banner
 from core.modules.ip.known_vpn import known_vpn
 
 # Online
+from core.modules.online.username import username_lookup
 
 # Phone
 
@@ -86,7 +87,14 @@ class Main:
             {
                 "name" : "Online",
                 "arg" : "Url",
-                "funcs" : []
+                "funcs" : [
+                    {
+                        "name" : "Username",
+                        "func" : username_lookup,
+                        "args" : ["Username"],
+                        "report_key" : "ONLINE_USERNAME_RESULT"
+                    }
+                ]
             },
             {
                 "name" : "Phone",
@@ -149,6 +157,8 @@ class Main:
 
         print(self.report)
         create(self.report)
+        with open("report.json", "w") as f:
+            f.write(json.dumps(self.report, indent=4))
 
 if __name__ == "__main__":
     main = Main()
