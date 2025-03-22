@@ -1,5 +1,6 @@
 import json, tls_client
 from core.modules.report.create import create
+from core.modules.report.format import show
 
 # Bank
 from core.modules.bank.bincheck import bincheck
@@ -157,6 +158,7 @@ class Main:
 
         print(self.report)
         create(self.report)
+        show(self.report)
         with open("report.json", "w") as f:
             f.write(json.dumps(self.report, indent=4))
 

@@ -75,6 +75,13 @@ class Extra:
             emails = get_emails(username)
             result["emails"] = emails
         return result
+    
+    def minecraft(self, username):
+        api = "https://api.mojang.com/users/profiles/minecraft/{}".format(username)
+        response = self.session.get(api)
+        if response.status_code == 200:
+            data = response.json()
+            return data
 
 class UsernameLookup:
     def __init__(self, username, session):
@@ -100,6 +107,7 @@ class UsernameLookup:
     def post_analysis(self):
         extras = {
             "https://github.com/{}".format(self.username): self.extra.github,
+            "https://api.mojang.com/users/profiles/minecraft/{}".format(self.username): self.extra.minecraft
         }
         for site in self.result:
             if site in extras:
