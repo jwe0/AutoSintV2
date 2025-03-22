@@ -19,12 +19,27 @@ from core.modules.ip.known_vpn import known_vpn
 
 # Phone
 
+from core.modules.phone.basic import phone_basic
+from core.modules.phone.codeinfo import codeinfo
+
 
 
 class Main:
     def __init__(self):
         self.session = tls_client.Session()
         self.modules = [
+            {
+                "name" : "Identity",
+                "arg" : "Identity",
+                "funcs" : [
+                    {
+                        "name" : "Namelog",
+                        "func" : namelog,
+                        "args" : ["First Name", "Last Name"],
+                        "report_key" : "NAME"
+                    }
+                ]
+            },
             {
                 "name" : "Bank",
                 "arg" : "Bin",
@@ -42,18 +57,7 @@ class Main:
                 "arg" : "Email",
                 "funcs" : []
             },
-            {
-                "name" : "Identity",
-                "arg" : "Identity",
-                "funcs" : [
-                    {
-                        "name" : "Namelog",
-                        "func" : namelog,
-                        "args" : ["First Name", "Last Name"],
-                        "report_key" : "NAME"
-                    }
-                ]
-            },
+
             {
                 "name" : "IP",
                 "arg" : "Ip",
@@ -75,6 +79,30 @@ class Main:
                         "func" : known_vpn,
                         "args" : ["Ip"],
                         "report_key" : "KNOWN_VPN_RESULT"
+                    }
+                ]
+            },
+
+            {
+                "name" : "Online",
+                "arg" : "Url",
+                "funcs" : []
+            },
+            {
+                "name" : "Phone",
+                "arg" : "Phone",
+                "funcs" : [
+                    {
+                        "name" : "Basic",
+                        "func" : phone_basic,
+                        "args" : ["Phone"],
+                        "report_key" : "PHONE_BASIC_RESULT"
+                    },
+                    {
+                        "name" : "Codeinfo",
+                        "func" : codeinfo,
+                        "args" : ["Phone"],
+                        "report_key" : "PHONE_CODEINFO_RESULT"
                     }
                 ]
             }
