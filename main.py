@@ -7,6 +7,8 @@ from core.modules.bank.bincheck import bincheck
 
 # Email
 
+from core.modules.email.intelx import intelx
+
 # Identity
 
 from core.modules.identity.namelog import namelog
@@ -57,7 +59,14 @@ class Main:
             {
                 "name" : "Email",
                 "arg" : "Email",
-                "funcs" : []
+                "funcs" : [
+                    {
+                        "name" : "Intelx",
+                        "func" : intelx,
+                        "args" : ["Email"],
+                        "report_key" : "EMAIL_RESULT"
+                    }
+                ]
             },
 
             {
