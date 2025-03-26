@@ -8,6 +8,7 @@ from core.modules.bank.bincheck import bincheck
 # Email
 
 from core.modules.email.intelx import intelx
+from core.modules.email.getgmailpfp import emailpfp
 
 # Identity
 
@@ -65,6 +66,12 @@ class Main:
                         "func" : intelx,
                         "args" : ["Email"],
                         "report_key" : "EMAIL_RESULT"
+                    },
+                    {
+                        "name" : "Email PFP",
+                        "func" : emailpfp,
+                        "args" : ["Email"],
+                        "report_key" : "EMAIL_PFP_RESULT"
                     }
                 ]
             },
