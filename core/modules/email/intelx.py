@@ -34,7 +34,7 @@ def intelx(self, session, email):
         "sort":2,
         "media":0,
         "terminate":[]
-        }
+    }
     r = session.post(api, headers=headers, json=form)
     if r.status_code == 200:
         data = r.json()
