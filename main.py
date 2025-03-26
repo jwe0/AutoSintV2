@@ -9,6 +9,7 @@ from core.modules.bank.bincheck import bincheck
 
 from core.modules.email.intelx import intelx
 from core.modules.email.getgmailpfp import emailpfp
+from core.modules.email.protonmail import protonmail
 
 # Identity
 
@@ -72,6 +73,12 @@ class Main:
                         "func" : emailpfp,
                         "args" : ["Email"],
                         "report_key" : "EMAIL_PFP_RESULT"
+                    },
+                    {
+                        "name" : "Protonmail",
+                        "func" : protonmail,
+                        "args" : ["Email"],
+                        "report_key" : "PROTONMAIL_RESULT"
                     }
                 ]
             },

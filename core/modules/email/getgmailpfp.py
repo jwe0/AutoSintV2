@@ -1,6 +1,5 @@
 import requests
 
-
 def load_headers():
     headers = {}
     with open("core/assets/headers.txt", "r") as f:
@@ -8,7 +7,7 @@ def load_headers():
             if ":" in line:
                 key, value = line.split(":", 1)
                 headers[key.strip()] = value.strip()
-    return headers
+    return headers 
 
 def flatten(array):
     result = []
