@@ -10,4 +10,4 @@ def get_banner(self, session, ip, port):
     except:
         banner = "Unknown"
 
-    return banner
+    return {"banner": banner}

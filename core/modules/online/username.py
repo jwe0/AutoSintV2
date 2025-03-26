@@ -94,14 +94,17 @@ class UsernameLookup:
         self.extra    = Extra(self.session)
         
     def check(self, type, value, url):
-        url = url.format(self.username)
-        response = self.session.get(url)
-        if type == "status-code":
-            if response.status_code == value:
-                self.result[url] = response.status_code
-        elif type == "site-content":
-            if value in response.text:
-                self.result[url] = response.text
+        try:
+            url = url.format(self.username)
+            response = self.session.get(url)
+            if type == "status-code":
+                if response.status_code == value:
+                    self.result[url] = response.status_code
+            elif type == "site-content":
+                if value in response.text:
+                    self.result[url] = response.text
+        except Exception as e:
+            pass
         self.prog += 1
 
     def post_analysis(self):

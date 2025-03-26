@@ -3,7 +3,7 @@ import datetime, re
 def pub_key(session, email):
     api = "https://api.protonmail.ch/pks/lookup?op=get&search={}".format(email)
     r = session.get(api)
-    return r.text
+    return r.text.replace("\n", "")
 
 def protonmail(self, session, email):
     api = "https://api.protonmail.ch/pks/lookup?op=index&search={}".format(email)
