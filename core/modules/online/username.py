@@ -82,6 +82,47 @@ class Extra:
         if response.status_code == 200:
             data = response.json()
             return data
+        
+    def pornhub(self, username):
+        result = {}
+        def more_info(soup):
+            info = {}
+            more_info = soup.find("dl", class_="moreInformation")
+            if more_info:
+                dts = more_info.find_all("dt")
+                dds = more_info.find_all("dd")
+                for i, dt in enumerate(dts):
+                    info[dt.text.strip()] = dds[i].text.strip()
+            return info
+        def achievments(username):
+            result = []
+            url = "https://www.pornhub.com/users/{}/myachievements".format(username)
+            response = self.session.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+                achievments = soup.find("ul", class_="achievementsUl")
+                lis = achievments.find_all("li")
+                for li in lis:
+                    span = li.find_all("span")
+                    if len(span) > 1:
+                        result.append(span[1].get_text().strip())
+            return result
+        url = "https://www.pornhub.com/users/{}".format(username)
+        response = self.session.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            pclass = soup.find("div", class_="profileUserName")
+            if pclass:
+                a = pclass.find("a", href=True)
+                if a:
+                    username = a.get("href").split("/")[-1]
+                    result["username"] = username
+            more_info2 = more_info(soup)
+            achs = achievments(username)
+            result["more_info"] = more_info2
+            result["achievements"] = achs
+
+        return result
 
 class UsernameLookup:
     def __init__(self, username, session):
@@ -110,7 +151,8 @@ class UsernameLookup:
     def post_analysis(self):
         extras = {
             "https://github.com/{}".format(self.username): self.extra.github,
-            "https://api.mojang.com/users/profiles/minecraft/{}".format(self.username): self.extra.minecraft
+            "https://api.mojang.com/users/profiles/minecraft/{}".format(self.username): self.extra.minecraft,
+            "https://www.pornhub.com/users/{}".format(self.username): self.extra.pornhub
         }
         for site in self.result:
             if site in extras:
