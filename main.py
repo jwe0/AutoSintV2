@@ -19,6 +19,7 @@ from core.modules.identity.namelog import namelog
 from core.modules.ip.lookup import lookup
 from core.modules.ip.getbanner import get_banner
 from core.modules.ip.known_vpn import known_vpn
+from core.modules.ip.portscan import portscan
 
 # Online
 from core.modules.online.username import username_lookup
@@ -104,6 +105,12 @@ class Main:
                         "func" : known_vpn,
                         "args" : ["Ip"],
                         "report_key" : "KNOWN_VPN_RESULT"
+                    },
+                    {
+                        "name" : "Portscan",
+                        "func" : portscan,
+                        "args" : ["Ip"],
+                        "report_key" : "PORTSCAN_RESULT"
                     }
                 ]
             },
