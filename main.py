@@ -21,6 +21,9 @@ from core.modules.ip.getbanner import get_banner
 from core.modules.ip.known_vpn import known_vpn
 from core.modules.ip.portscan import portscan
 
+# Location
+from core.modules.location.addresslog import addresslog
+
 # Online
 from core.modules.online.username import username_lookup
 
@@ -38,6 +41,7 @@ class Main:
             {
                 "name" : "Identity",
                 "arg" : "Identity",
+                "format" : "(first_name) (last_name)",
                 "funcs" : [
                     {
                         "name" : "Namelog",
@@ -50,6 +54,7 @@ class Main:
             {
                 "name" : "Bank",
                 "arg" : "Bin",
+                "format" : "xxxxxxxx",
                 "funcs" : [
                     {
                         "name" : "Bincheck",
@@ -62,6 +67,7 @@ class Main:
             {
                 "name" : "Email",
                 "arg" : "Email",
+                "format" : "something@provider.tld",
                 "funcs" : [
                     {
                         "name" : "Intelx",
@@ -87,6 +93,7 @@ class Main:
             {
                 "name" : "IP",
                 "arg" : "Ip",
+                "format" : "x.x.x.x",
                 "funcs" : [
                     {
                         "name" : "Lookup",
@@ -114,10 +121,23 @@ class Main:
                     }
                 ]
             },
-
+            {
+                "name" : "Location",
+                "arg" : "Address",
+                "format" : "(house number), (street), (city), (state/county), (country), (postal code)",
+                "funcs" : [
+                    {
+                        "name" : "Addresslog",
+                        "func" : addresslog,
+                        "args" : ["Address"],
+                        "report_key" : "ADDRESSLOG_RESULT"
+                    }
+                ]
+            },
             {
                 "name" : "Online",
                 "arg" : "Url",
+                "format" : "username",
                 "funcs" : [
                     {
                         "name" : "Username",
@@ -130,6 +150,7 @@ class Main:
             {
                 "name" : "Phone",
                 "arg" : "Phone",
+                "format" : "+xx-xxxxxxxxxxx",
                 "funcs" : [
                     {
                         "name" : "Basic",
@@ -151,16 +172,19 @@ class Main:
             "Bank" : {},
             "Email" : {},
             "IP" : {},
+            "Location" : {},
             "Online" : {},
             "Phone" : {}
         }
 
     def setup(self):
         info_config = {}
+        print("If you do not know the data for a module, leave it blank. If the module has multiple sections then put N/A.")
         for mod in self.modules:
             name = mod["name"]
             sections = " | ".join([f"[{func['name']}]" for func in mod["funcs"]])
             print("Data for: {}".format(sections))
+            print("Format: <{}>".format(mod["format"]))
             data = input(name + " : ")
             if data:
                 info_config[name] = {"data" : data, "section" : name}
@@ -185,7 +209,7 @@ class Main:
             f.write(json.dumps(self.report, indent=4))
         create(self.report)
         show(self.report)
-        
+
 if __name__ == "__main__":
     main = Main()
     main.main()
