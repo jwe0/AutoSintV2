@@ -7,9 +7,15 @@ class Portscan:
         self.progress = 0
         self.result = {}
         self.lock = threading.Lock()
+        self.ports = []
+
+    def load_ports(self):
+        ports = json.loads(open("core/dependencies/ports.json").read())
+        for port in ports:
+            self.ports.append(port)
 
     def lookup(self, port):
-        ports = json.loads(open("ports.json").read())
+        ports = json.loads(open("core/dependencies/ports.json").read())
         return ports[str(port)] if str(port) in ports else {"service": "Unknown", "protocols": "Unknown"}
 
     def banner(self, host, port):
@@ -31,16 +37,22 @@ class Portscan:
             if con == 0:
                 info = self.lookup(port)
                 banner_ = self.banner(host, port)
-                self.result[port] = {"service": info["service"], "protocol": info["protocols"], "banner": banner_}
+                self.result[port] = {}
+
+                self.result[port]["basic"] = {"port" : port, "service" : info["service"]}
+                self.result[port]["extra"] = {"protocols" : info["protocols"], "banner" : banner_}
+                self.progress += 1
                 self.progress += 1
             else:
                 self.progress += 1
         except:
             self.progress += 1
+        print(f"{port}:{self.progress}", end="\r")
 
     def start(self, ip):
-        with ThreadPoolExecutor(max_workers=100) as executor:
-            futures = [executor.submit(self.scan, ip, port) for port in range(1, 65535)]
+        self.load_ports()
+        with ThreadPoolExecutor(max_workers=250) as executor:
+            futures = [executor.submit(self.scan, ip, port) for port in self.ports]
             for future in as_completed(futures):
                 with self.lock:
                     completed = (self.progress / 65535) * 100

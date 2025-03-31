@@ -1,5 +1,5 @@
-def namelog(self, session, first_name, last_name):
+def namelog(self, session, name):
     return {
-        "first_name" : first_name,
-        "last_name" : last_name
+        "first_name" : name.split(" ")[0],
+        "last_name" : name.split(" ")[1]
     }

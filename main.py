@@ -42,7 +42,7 @@ class Main:
                     {
                         "name" : "Namelog",
                         "func" : namelog,
-                        "args" : ["First Name", "Last Name"],
+                        "args" : ["Name"],
                         "report_key" : "NAME"
                     }
                 ]
@@ -97,7 +97,7 @@ class Main:
                     {
                         "name" : "Banner",
                         "func" : get_banner,
-                        "args" : ["Ip", "Port"],
+                        "args" : ["Ip", 22],
                         "report_key" : "IP_BANNER_RESULT"
                     },
                     {
@@ -146,41 +146,36 @@ class Main:
                 ]
             }
         ]
-        self.report = {}
+        self.report = {
+            "Identity" : {},
+            "Bank" : {},
+            "Email" : {},
+            "IP" : {},
+            "Online" : {},
+            "Phone" : {}
+        }
 
     def setup(self):
         info_config = {}
         for mod in self.modules:
-            self.report[mod["name"]] = {}
-            print("[ {}".format(mod["name"]))
-            info_config[mod["name"]] = {}
-            info_config[mod["name"]]["funcs"] = []
-            for func in mod["funcs"]:
-                info_config[mod["name"]]["funcs"].append({
-                    "name" : func["name"],
-                    "func" : func["func"],
-                    "mod"  : mod["name"],
-                    "args" : []
-                })
-                print("| ARGS FOR {}".format(func["name"]))
-                for arg in func["args"]:
-                    input_arg = input(f"[ {arg} : ")
-                    if input_arg:
-                        info_config[mod["name"]]["funcs"][-1]["args"].append(input_arg)
+            name = mod["name"]
+            sections = " | ".join([f"[{func['name']}]" for func in mod["funcs"]])
+            print("Data for: {}".format(sections))
+            data = input(name + " : ")
+            if data:
+                info_config[name] = {"data" : data, "section" : name}
         return info_config
     
     def run(self, info_config):
         for mod in info_config:
-            module_data = info_config[mod]
-            for func in module_data["funcs"]:
-                if func["args"] == []:
-                    print("Skipping {}".format(func["name"]))
-                    continue
-                print("Running {}".format(func["name"]))
-                func_name = func["name"]
-                args      = func["args"]
-                func_func = func["func"]
-                self.report[mod][func_name] = func_func(self, self.session, *args)
+            for modules in self.modules:
+                if modules["name"] == mod:
+                    for func in modules["funcs"]:
+                        print("Running {} for {}...".format(func["name"], mod))
+                        try:
+                            self.report[mod][func["name"]] = func["func"](self, self.session, info_config[mod]["data"])
+                        except Exception as e:
+                            print(e)
 
     def main(self):
         data = self.setup()
