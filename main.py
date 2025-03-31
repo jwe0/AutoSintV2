@@ -124,7 +124,7 @@ class Main:
             {
                 "name" : "Location",
                 "arg" : "Address",
-                "format" : "(house number), (street), (city), (state/county), (country), (postal code)",
+                "format" : "(house number), (street), (city), (state/county), (country), (postal code) [seperate with ,]",
                 "funcs" : [
                     {
                         "name" : "Addresslog",
