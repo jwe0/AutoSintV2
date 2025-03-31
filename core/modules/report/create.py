@@ -2,37 +2,70 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 
+def flatten(data, indent_level=0):
+    message = ""
+    for key, value in data.items():
+        if isinstance(value, dict):
+            message += flatten(value, indent_level + 1)
+        elif isinstance(value, list):
+            message += "    " * indent_level
+            message += "• " if indent_level > 0 else " "
+            message += f" {key}: {', '.join(value)}\n"
+        else:
+            message += "    " * indent_level
+            message += "• " if indent_level > 0 else " "
+            message += f" {key}: {value}\n"
+
+    return message
+
+
+def show(data):
+    message = ""
+    for sec in data:
+        message += f"\n# {sec}\n"
+        sec_info = data[sec]
+        for func in sec_info:
+            message += f"## {func}\n"
+            func_info = sec_info[func]
+            if func_info:
+                if isinstance(func_info, dict):
+                    message += flatten(func_info)
+    return message
+
+
 def create(data):
-    done = []
+    message = show(data)
     c = canvas.Canvas("report.pdf", pagesize=letter)
     c.setFont("Helvetica", 10)
     c.setStrokeColor(colors.black)
     c.setFillColor(colors.black)
 
-    text = c.beginText(40, 750)
-    text.setFont("Helvetica", 10)
+    margin_top = 750
+    margin_bottom = 50
+    line_height = 12 
+    x_position = 40
+    y_position = margin_top
 
-    def add_sec(sec, title, content):
-        if sec not in done:
-            text.setFont("Helvetica-Bold", 11)
-            text.textLine(f"{sec}")
-            done.append(sec)
-        text.setFont("Helvetica-Bold", 10)
-        text.textLine(f"    {title}")
-        text.setFont("Helvetica", 10)
-        if isinstance(content, dict):
-            for k, v in content.items():
-                text.textLine(f"        {k}: {v}")
+    for line in message.split("\n"):
+        if y_position < margin_bottom:
+            c.showPage()
+            c.setFont("Helvetica", 10)
+            y_position = margin_top
+        if "##" in line:
+            c.setFont("Helvetica-Bold", 11)
+            c.drawString(x_position, y_position, line.replace("##", ""))
+            y_position -= line_height
+            c.drawString(x_position, y_position, " ")
+        elif "#" in line:
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(x_position, y_position, line.replace("#", ""))
+            y_position -= line_height
+            c.drawString(x_position, y_position, " ")
         else:
-            text.textLine(f"        {content}")
-        text.textLine("")
+            c.setFont("Helvetica", 10)
+            c.drawString(x_position, y_position, line)
+        
+        y_position -= line_height
 
-    for sec in data:
-        sec_data = data[sec]
-        for func in sec_data:
-            func_data = sec_data[func]
-            add_sec(sec, func, func_data)
-
-    c.drawText(text)
     c.showPage()
     c.save()
