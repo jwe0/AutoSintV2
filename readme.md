@@ -21,6 +21,13 @@
         "Namelog": {
             "first_name": "John",
             "last_name": "Doe"
+        },
+        "Address" : {
+            "postal_code": "12345",
+            "city": "Example City",
+            "state": "Example State",
+            "country": "Example Country",
+            "address": "123 Example Street"
         }
     },
     "Bank": {
@@ -69,7 +76,7 @@
             "zipCode": "00000",
             "cityName": "Null City",
             "regionName": "Null Region",
-            "isProxy": false,
+            "isProxy": False,
             "continent": "Unknown",
             "continentCode": "XX",
             "currency": {
@@ -84,44 +91,98 @@
                 ".xx"
             ]
         },
-        "Banner": "Example Server Banner",
+        "Banner": {
+            "banner": "Example Banner"
+        },
         "Known VPN": {
             "provider": "ExampleVPN",
             "ip": "0.0.0.0"
+        },
+        "Portscan" : {
+            "143": {
+                "service": "IMAP",
+                "protocol": "TCP, UDP",
+                "banner": "* OK IMAP ready for requests."
+            },
+            "37": {
+                "service": "Unknown",
+                "protocol": "Unknown",
+                "banner": "Unknown"
+            },
+            "21": {
+                "service": "FTP",
+                "protocol": "TCP, UDP, SCTP",
+                "banner": "220-Welcome to FTP server!\r\n220 If you don't have an account, log in as 'anonymous' or 'ftp'."
+            },
+            "13": {
+                "service": "Unknown",
+                "protocol": "Unknown",
+                "banner": "Mon, 31 Mar 2025 14:13:37 GMT"
+            },
+            "22": {
+                "service": "SSH/SCP/SFTP",
+                "protocol": "TCP, UDP, SCTP",
+                "banner": "SSH-2.0-GenericSSH_5.0"
+            },
+            "80": {
+                "service": "HTTP",
+                "protocol": "TCP, UDP, SCTP",
+                "banner": "Unknown"
+            },
+            "990": {
+                "service": "FTPS",
+                "protocol": "TCP",
+                "banner": "Unknown"
+            }
         }
     },
     "Online": {
         "Username": {
-            "https://github.com/example": {
-                "site": "https://github.com/example",
+            "https://github.com/example_user": {
+                "site": "https://github.com/example_user",
                 "result": 200,
                 "extra": {
-                    "fullname": "John Doe",
+                    "fullname": "",
                     "username": "example_user",
-                    "emails": [
-                        "example@example.com"
+                    "emails": []
+                }
+            },
+            "https://www.snapchat.com/add/example_user": {
+                "site": "https://www.snapchat.com/add/example_user",
+                "result": 200,
+                "extra": None
+            },
+            "https://api.mojang.com/users/profiles/minecraft/example_user": {
+                "site": "https://api.mojang.com/users/profiles/minecraft/example_user",
+                "result": 200,
+                "extra": {
+                    "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                    "name": "ExampleUser"
+                }
+            },
+            "https://www.pornhub.com/users/anonymous123": {
+                "site": "https://www.pornhub.com/users/anonymous123",
+                "result": 200,
+                "extra": {
+                    "username": "anonymous123",
+                    "more_info": {
+                        "Gender": "Male",
+                        "Last Login": "1 month ago",
+                        "Interested In": "Categories",
+                        "Profile Views": "26",
+                        "Videos Watched": "1"
+                    },
+                    "achievements": [
+                        "Achievement 1",
+                        "Achievement 2"
                     ]
                 }
-            },
-            "https://api.mojang.com/users/profiles/minecraft/example": {
-                "site": "https://api.mojang.com/users/profiles/minecraft/example",
-                "result": 200,
-                "extra": {
-                    "id": "example_mojang_id",
-                    "name": "ExampleMC"
-                }
-            },
-            "https://www.snapchat.com/add/example": {
-                "site": "https://www.snapchat.com/add/example",
-                "result": 200,
-                "extra": null
             }
-    }
+        }
+    },
     "Phone": {
         "Basic": {
-            "carrier": {
-                "en": "Example Carrier"
-            }
+            "carrier": "Example Carrier"
         },
         "Codeinfo": {
             "FIFA": "XXX",
