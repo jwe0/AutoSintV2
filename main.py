@@ -181,12 +181,11 @@ class Main:
         data = self.setup()
         self.run(data)
 
-        print(self.report)
-        create(self.report)
-        show(self.report)
         with open("report.json", "w") as f:
             f.write(json.dumps(self.report, indent=4))
-
+        create(self.report)
+        show(self.report)
+        
 if __name__ == "__main__":
     main = Main()
     main.main()

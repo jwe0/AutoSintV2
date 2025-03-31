@@ -30,6 +30,7 @@ class Portscan:
             return "Unknown"
 
     def scan(self, host, port):
+        self.result["host"] = host
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1)
         try:
@@ -37,10 +38,15 @@ class Portscan:
             if con == 0:
                 info = self.lookup(port)
                 banner_ = self.banner(host, port)
-                self.result[port] = {}
+                self.result[port] = {
+                    "port" : port,
+                    "extra" : {
+                        "service" : info["service"],
+                        "protocols" : info["protocols"],
+                        "banner" : banner_
+                    }
+                }
 
-                self.result[port]["basic"] = {"port" : port, "service" : info["service"]}
-                self.result[port]["extra"] = {"protocols" : info["protocols"], "banner" : banner_}
                 self.progress += 1
                 self.progress += 1
             else:
