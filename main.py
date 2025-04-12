@@ -26,6 +26,7 @@ from core.modules.location.addresslog import addresslog
 
 # Online
 from core.modules.online.username import username_lookup
+from core.modules.online.domainsearch import domainsearch
 
 # Phone
 
@@ -144,6 +145,12 @@ class Main:
                         "func" : username_lookup,
                         "args" : ["Username"],
                         "report_key" : "ONLINE_USERNAME_RESULT"
+                    },
+                    {
+                        "name" : "Domainsearch",
+                        "func" : domainsearch,
+                        "args" : ["Username"],
+                        "report_key" : "ONLINE_DOMAINSEARCH_RESULT"
                     }
                 ]
             },

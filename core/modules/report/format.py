@@ -2,6 +2,7 @@ def flatten(data, indent_level=0):
     message = ""
     for key, value in data.items():
         if isinstance(value, dict):
+            message += "    " * indent_level + "   • {}:\n".format(key)
             message += flatten(value, indent_level + 1)
         elif isinstance(value, list):
             message += "    " * indent_level
