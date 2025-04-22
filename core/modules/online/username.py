@@ -144,14 +144,18 @@ class Other_Methods:
                             wall_name = wall.get("name")
                             result["walls"][wall_id] = wall_name
 
-                    avatar = response.get("avatar").get("variants")
+                    avatar = response.get("avatar")
+                    if avatar:
+                        avatar = avatar.get("variants")
                     if avatar:
                         result["avatar"] = []
                         for a in avatar:
                             location = a.get("locations")[0].get("location")
                             result["avatar"].append(location)
 
-                    banner = response.get("banner").get("variants")
+                    banner = response.get("banner")
+                    if banner:
+                        banner = banner.get("variants")
                     if banner:
                         result["banner"] = []
                         for b in banner:
