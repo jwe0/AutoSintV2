@@ -47,7 +47,6 @@ class Other_Methods:
                     datax["alternatenames"] = alternatenames
                     datax["identifier"] = identifier
                     datax["description"] = description
-                    datax["image"] = image
 
             location = soup.find("p", class_="b-user-info__detail m-break-word m-markdown")
             if location:
@@ -154,7 +153,6 @@ class Other_Methods:
                         result["avatar"] = []
                         for a in avatar:
                             location = a.get("locations")[0].get("location")
-                            result["avatar"].append(location)
                             self.external_self.report["Images"].append(location)
 
                     banner = response.get("banner")
@@ -164,7 +162,6 @@ class Other_Methods:
                         result["banner"] = []
                         for b in banner:
                             location = b.get("locations")[0].get("location")
-                            result["banner"].append(location)
                             self.external_self.report["Images"].append(location)
                     return result
                 
