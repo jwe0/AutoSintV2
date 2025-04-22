@@ -1,3 +1,4 @@
+import os, random, string, json, requests
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.pdfgen import canvas
@@ -22,8 +23,11 @@ def flatten(data, indent_level=0):
 
 
 def show(data):
+    blacklist = ["Images"]
     message = ""
     for sec in data:
+        if sec in blacklist:
+            continue
         message += f"\n○ {sec}\n"
         sec_info = data[sec]
         for func in sec_info:
@@ -35,9 +39,9 @@ def show(data):
     return message
 
 
-def create(data):
+def create(data, id):
     message = show(data)
-    c = canvas.Canvas("report.pdf", pagesize=letter)
+    c = canvas.Canvas("reports/{}/report.pdf".format(id), pagesize=letter)
     c.setFont("Helvetica", 10)
     c.setStrokeColor(colors.black)
     c.setFillColor(colors.black)
@@ -71,3 +75,51 @@ def create(data):
 
     c.showPage()
     c.save()
+
+def dirs(json_data):
+    def find_ext(url):
+        types = [
+            "jpg",
+            "png",
+            "jpeg",
+            "gif",
+            "svg",
+        ]
+
+        for type_ in types:
+            if type_ in url:
+                return type_
+
+
+    id = "".join(random.choices(string.ascii_letters + string.digits, k=10))
+
+    dirs_ = [
+        "reports",
+        f"reports/{id}",
+        f"reports/{id}/media",
+        f"reports/{id}/media/images",
+    ]
+
+    for dir_ in dirs_:
+        if not os.path.exists(dir_):
+            os.mkdir(dir_)
+
+    images = json_data["Images"]
+    for image in images:
+        r = requests.get(image)
+        name = "".join(random.choices(string.ascii_letters + string.digits, k=15))
+        extension = find_ext(image)
+        with open(f"reports/{id}/media/images/{name}.{extension}", "wb") as f:
+            f.write(r.content)
+
+    if not os.path.exists(f"reports/{id}"):
+        os.mkdir(f"reports/{id}")
+
+    with open(f"reports/{id}/report.json", "w") as f:
+        json.dump(json_data, f, indent=4, ensure_ascii=True)
+
+    with open(f"reports/{id}/report.txt", "w") as f:
+        message = show(json_data)
+        f.write(message)
+
+    create(json_data, id)

@@ -18,8 +18,11 @@ def flatten(data, indent_level=0):
 
 
 def show(data):
+    blacklist = ["Images"]
     message = ""
     for sec in data:
+        if sec in blacklist:
+            continue
         message += f"\n○ {sec}\n"
         sec_info = data[sec]
         for func in sec_info:

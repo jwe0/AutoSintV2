@@ -1,5 +1,5 @@
 import json, tls_client
-from core.modules.report.create import create
+from core.modules.report.create import create, dirs
 from core.modules.report.format import show
 
 # Bank
@@ -181,7 +181,8 @@ class Main:
             "IP" : {},
             "Location" : {},
             "Online" : {},
-            "Phone" : {}
+            "Phone" : {},
+            "Images" : []
         }
 
     def setup(self):
@@ -215,7 +216,7 @@ class Main:
         with open("report.json", "w") as f:
             f.write(json.dumps(self.report, indent=4))
         show(self.report)
-        create(self.report)
+        dirs(self.report)
 
 if __name__ == "__main__":
     main = Main()

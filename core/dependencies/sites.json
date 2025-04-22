@@ -191,8 +191,8 @@
     },
     "All my links" : {
         "url" : "https://allmylinks.com/{}",
-        "type" : "title-content",
-        "check-value" : "Not Found"
+        "type" : "status-code",
+        "check-value" : 200
     },
     "Soloto": {
         "url": "https://solo.to/{}",

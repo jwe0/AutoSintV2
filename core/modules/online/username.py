@@ -3,8 +3,9 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 
 class Other_Methods:
-    def __init__(self, session):
+    def __init__(self, session, external_self):
         self.session = session
+        self.external_self = external_self
 
     def of(self, username):
         options = webdriver.ChromeOptions()
@@ -39,6 +40,8 @@ class Other_Methods:
                     identifier = main["identifier"]
                     description = main["description"]
                     image = main["image"]
+                    if image:
+                        self.external_self.report["Images"].append(image)
 
                     datax["name"] = name
                     datax["alternatenames"] = alternatenames
@@ -152,6 +155,7 @@ class Other_Methods:
                         for a in avatar:
                             location = a.get("locations")[0].get("location")
                             result["avatar"].append(location)
+                            self.external_self.report["Images"].append(location)
 
                     banner = response.get("banner")
                     if banner:
@@ -161,6 +165,7 @@ class Other_Methods:
                         for b in banner:
                             location = b.get("locations")[0].get("location")
                             result["banner"].append(location)
+                            self.external_self.report["Images"].append(location)
                     return result
                 
                 else:
@@ -368,11 +373,39 @@ class Extra:
             result["achievements"] = achs
 
         return result
+    
+    def allmylinks(self, username):
+        result = {}
+        url = "https://allmylinks.com/{}".format(username)
+        response = self.session.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
 
+            box = soup.find("div", class_="left-sidebar-box")
+            if box:
+                username = box.find("span", class_="profile-username profile-page")
+                if username:
+                    username = username.get_text().strip()
+                    result["username"] = username
+            links = soup.find_all("a", class_="list-item link-type-web link", href=True)
+            if links:
+                result["links"] = {}
+                for link in links:
+                    data_x_url = link.get("data-x-url")
+                    if data_x_url in result["links"]:
+                        continue
+                    title = link.find("span", class_="link-title")
+                    if title:
+                        title = title.get_text().strip()
+                    else:
+                        title = link.get_text().strip()
+                    result["links"][title] = data_x_url
+        return result
 class UsernameLookup:
-    def __init__(self, username, session):
+    def __init__(self, username, session, external_self):
+        self.external_self = external_self
         self.sites    = json.load(open("core/dependencies/sites.json", "r"))
-        self.other_methods = Other_Methods(session)
+        self.other_methods = Other_Methods(session, external_self)
         self.Other    = {
             "Onlyfans" : {
                 "url" : "https://onlyfans.com/{}",
@@ -408,7 +441,8 @@ class UsernameLookup:
             "https://github.com/{}".format(self.username): self.extra.github,
             "https://api.mojang.com/users/profiles/minecraft/{}".format(self.username): self.extra.minecraft,
             "https://www.pornhub.com/users/{}".format(self.username): self.extra.pornhub,
-            "https://www.pornhub.com/model/{}".format(self.username): self.extra.pornhub2
+            "https://www.pornhub.com/model/{}".format(self.username): self.extra.pornhub2,
+            "https://allmylinks.com/{}".format(self.username): self.extra.allmylinks
         }
         for site in self.result:
             if site in extras:
@@ -446,6 +480,6 @@ class UsernameLookup:
         self.post_analysis()
 
 def username_lookup(self, session, username):
-    lookup = UsernameLookup(username, session)
+    lookup = UsernameLookup(username, session, self)
     lookup.start()
     return lookup.report
