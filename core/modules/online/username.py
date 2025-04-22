@@ -310,6 +310,19 @@ class Extra:
                         value = spans[1].text.strip()
 
                         info_[key] = value
+                clearfix = soup.find("ul", class_="clearfix socialList")
+                if clearfix:
+                    result["socials"] = {}
+                    socials = clearfix.find_all("li")
+    
+                    for social in socials:
+                        a = social.find("a", href=True)
+                        span = social.find("span")
+                        if span:
+                            title = span.get_text().strip()
+
+                            result["socials"][title] = a.get("href").strip()
+
             return info_
         def achievments(username):
             result = []
