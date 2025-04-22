@@ -214,8 +214,8 @@ class Main:
 
         with open("report.json", "w") as f:
             f.write(json.dumps(self.report, indent=4))
-        create(self.report)
         show(self.report)
+        create(self.report)
 
 if __name__ == "__main__":
     main = Main()

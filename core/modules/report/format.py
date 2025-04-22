@@ -6,7 +6,10 @@ def flatten(data, indent_level=0):
             message += flatten(value, indent_level + 1)
         elif isinstance(value, list):
             message += "    " * indent_level
-            message += f"   • {key}: {', '.join(value)}\n"
+            message += f"   • {key}\n"
+            for val in value:
+                message += "    " * indent_level
+                message += f"       • {val}\n"
         else:
             message += "    " * indent_level
             message += f"   • {key}: {value}\n"

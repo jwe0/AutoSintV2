@@ -1,4 +1,4 @@
-import json, threading, json, time
+import json, threading, json, time, requests
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
@@ -18,8 +18,7 @@ class Other_Methods:
             pass
         time.sleep(1)
         if "The link you followed may be broken, or the page may have been removed." in driver.page_source:
-            print("Non exist")
-            return {}
+            return {"error": "Non exist"}
         else:
             soup = BeautifulSoup(driver.page_source, "html.parser")
             # Json scrape
@@ -95,7 +94,76 @@ class Other_Methods:
             driver.quit()
 
             return datax
+    def fansly(self, username):
+        def provider_decode(id):
+            table = {
+                1: "Twitter",
+                4: "Instagram"
+            }
+            return table.get(int(id))
+        result = {}
+        api = "https://apiv3.fansly.com/api/v1/account?usernames={}&ngsw-bypass=true".format(username)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/237.84.2.178 Safari/537.36"
+        }
+        r = requests.get(api, headers=headers)
+        if r.status_code == 200:
+            data = r.json()
 
+            if data.get("response"):
+                if len(data.get("response")) > 0:
+                    response = data.get("response")[0]
+
+                    id = response.get("id")
+                    username = response.get("username")
+                    display_name = response.get("displayName")
+                    followers = response.get("followCount")
+                    location = response.get("location")
+                    about = response.get("about")
+
+                    result["id"] = id
+                    result["username"] = username
+                    result["display_name"] = display_name
+                    result["followers"] = followers
+                    result["location"] = location
+                    result["about"] = about
+
+                    socials = response.get("profileSocials")
+                    if socials:
+                        result["socials"] = {}
+                        for social in socials:
+                            handle = social.get("handle")
+                            provider = provider_decode(social.get("providerId"))
+                            result["socials"][provider] = handle
+
+                    walls = response.get("walls")
+                    if walls:
+                        result["walls"] = {}
+                        for wall in walls:
+                            wall_id = wall.get("id")
+                            wall_name = wall.get("name")
+                            result["walls"][wall_id] = wall_name
+
+                    avatar = response.get("avatar").get("variants")
+                    if avatar:
+                        result["avatar"] = []
+                        for a in avatar:
+                            location = a.get("locations")[0].get("location")
+                            result["avatar"].append(location)
+
+                    banner = response.get("banner").get("variants")
+                    if banner:
+                        result["banner"] = []
+                        for b in banner:
+                            location = b.get("locations")[0].get("location")
+                            result["banner"].append(location)
+                    return result
+                
+                else:
+                    return {"error": "No response"}
+            else:
+                return {"error": "No response"}
+        return result
 class Extra:
     def __init__(self, session):
         self.session = session
@@ -218,6 +286,71 @@ class Extra:
             result["achievements"] = achs
 
         return result
+    
+    def pornhub2(self, username):
+        result = {}
+        def more_info(username):
+            info_ = {}
+            url = "https://www.pornhub.com/model/{}/about".format(username)
+            response = self.session.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+
+                context_columns = soup.find("div", class_="content-columns js-highestChild columns-2")
+                if context_columns:
+                    info_pieces = context_columns.find_all("div", class_="infoPiece")
+                    for info in info_pieces:
+                        spans = info.find_all("span")
+
+                        key = spans[0].text.strip()
+                        value = spans[1].text.strip()
+
+                        info_[key] = value
+            return info_
+        def achievments(username):
+            result = []
+            url = "https://www.pornhub.com/model/{}/achievements".format(username)
+            response = self.session.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+                achievments = soup.find("ul", class_="achievementsUl")
+                lis = achievments.find_all("li")
+                for li in lis:
+                    span = li.find_all("span")
+                    if len(span) > 1:
+                        result.append(span[1].get_text().strip())
+            return result
+        url = "https://www.pornhub.com/model/{}".format(username)
+        response = self.session.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            name = soup.find("div", class_="name")
+            if name:
+                name = name.get_text().strip()
+                result["name"] = name
+
+            result["stats"] = {}
+
+            info_boxes = soup.find("div", class_="infoBoxes")
+
+            info_divs = info_boxes.find_all("div")
+
+            for info in info_divs:
+                value = info.find("span", class_="big")
+                title = info.find("div", class_="title")
+
+                if title:
+                    title = title.get_text().strip()
+
+                    result["stats"][title] = value.get_text().strip()
+                    
+            more_info2 = more_info(username)
+            achs = achievments(username)
+            result["more_info"] = more_info2
+            result["achievements"] = achs
+
+        return result
 
 class UsernameLookup:
     def __init__(self, username, session):
@@ -227,6 +360,10 @@ class UsernameLookup:
             "Onlyfans" : {
                 "url" : "https://onlyfans.com/{}",
                 "func" : self.other_methods.of
+            },
+            "Fansly" : {
+                "url" : "https://fansly.com/{}/posts",
+                "func" : self.other_methods.fansly
             }
         }
         self.result   = {}
@@ -244,17 +381,17 @@ class UsernameLookup:
                 if response.status_code == value:
                     self.result[url] = response.status_code
             elif type == "site-content":
-                if value in response.text:
-                    self.result[url] = response.text
+                if value not in response.text:
+                    self.result[url] = "{}".format(value)
         except Exception as e:
             pass
         self.prog += 1
-
     def post_analysis(self):
         extras = {
             "https://github.com/{}".format(self.username): self.extra.github,
             "https://api.mojang.com/users/profiles/minecraft/{}".format(self.username): self.extra.minecraft,
-            "https://www.pornhub.com/users/{}".format(self.username): self.extra.pornhub
+            "https://www.pornhub.com/users/{}".format(self.username): self.extra.pornhub,
+            "https://www.pornhub.com/model/{}".format(self.username): self.extra.pornhub2
         }
         for site in self.result:
             if site in extras:

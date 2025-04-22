@@ -213,5 +213,10 @@
         "url" : "https://e-z.bio/{}",
         "type" : "site-content",
         "check-value" : "Page not found"
+    },
+    "PornHubModel" : {
+        "url" : "https://www.pornhub.com/model/{}",
+        "type" : "status-code",
+        "check-value" : 200
     }
 }
