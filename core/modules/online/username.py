@@ -1,5 +1,100 @@
-import json, threading
+import json, threading, json, time
+from selenium import webdriver
 from bs4 import BeautifulSoup
+
+class Other_Methods:
+    def __init__(self, session):
+        self.session = session
+
+    def of(self, username):
+        options = webdriver.ChromeOptions()
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+        options.page_load_strategy = 'normal'
+        driver = webdriver.Chrome(options=options, )
+        driver.get("https://onlyfans.com/{}".format(username))
+
+        while "We'll try your destination again in 15 seconds" in driver.page_source:
+            pass
+        time.sleep(1)
+        if "The link you followed may be broken, or the page may have been removed." in driver.page_source:
+            print("Non exist")
+            return {}
+        else:
+            soup = BeautifulSoup(driver.page_source, "html.parser")
+            # Json scrape
+            defers = soup.find_all("script", type="application/ld+json")
+            if len(defers) == 1:
+                datax = {}
+                json_data = defers[0].get_text()
+                data = json.loads(json_data)
+                if "mainEntity" in data:
+                    main = data["mainEntity"]
+                    interactions = main["interactionStatistic"]
+                    datax["interactions"] = {}
+                    for interaction in interactions:
+                        datax["interactions"][interaction["@type"]] = interaction["userInteractionCount"]
+
+                    name = main["name"]
+                    alternatenames = main["alternateName"]
+                    identifier = main["identifier"]
+                    description = main["description"]
+                    image = main["image"]
+
+                    datax["name"] = name
+                    datax["alternatenames"] = alternatenames
+                    datax["identifier"] = identifier
+                    datax["description"] = description
+                    datax["image"] = image
+
+            location = soup.find("p", class_="b-user-info__detail m-break-word m-markdown")
+            if location:
+                location = location.get_text().strip()
+            else:
+                location = None
+
+            join_offers = soup.find("div", class_="b-offer-join")
+
+            if len(join_offers) > 0:
+                datax["join_offers"] = []
+                span = join_offers.find_all("span", class_="b-btn-text__small")
+                if len(span) > 0:
+                    for s in span:
+                        s = s.get_text()
+                        datax["join_offers"].append(s)
+
+            posts = soup.find("a", class_="b-tabs__nav__link m-reset-wcag-link-focus router-link-active m-with-rectangle-hover m-tb-sm m-current")
+
+            if posts:
+                datax["posts"] = posts.get_text().strip()
+            else:
+                datax["posts"] = None
+
+            media = soup.find("a", class_="b-tabs__nav__link m-reset-wcag-link-focus m-with-rectangle-hover m-tb-sm")
+
+            if media:
+                datax["media"] = media.get_text().strip()
+            else:
+                datax["media"] = None
+
+            post_types = soup.find("ul", class_="b-purchase__list g-text-ellipsis")
+
+            if post_types:
+                datax["post_types"] = {}
+                li = post_types.find_all("li")
+                for l in li:
+                    svg = l.find("svg")
+                    svg_data = svg.get("data-icon-name").split("icon-")[1]
+                    
+                    count = l.find("span")
+                    count = count.get_text().strip()
+                    datax["post_types"][svg_data] = count
+
+            datax["location"] = location
+
+            driver.quit()
+
+            return datax
 
 class Extra:
     def __init__(self, session):
@@ -127,6 +222,13 @@ class Extra:
 class UsernameLookup:
     def __init__(self, username, session):
         self.sites    = json.load(open("core/dependencies/sites.json", "r"))
+        self.other_methods = Other_Methods(session)
+        self.Other    = {
+            "Onlyfans" : {
+                "url" : "https://onlyfans.com/{}",
+                "func" : self.other_methods.of
+            }
+        }
         self.result   = {}
         self.report   = {}
         self.prog     = 0
@@ -178,6 +280,16 @@ class UsernameLookup:
             )).start()
         while self.prog < len(self.sites):
             pass
+
+        for site in self.Other:
+            site_info = self.Other[site]
+            response = site_info["func"](self.username)
+
+            self.report[site] = {
+                "site": site,
+                "result": None,
+                "extra" : response
+            }
         self.post_analysis()
 
 def username_lookup(self, session, username):

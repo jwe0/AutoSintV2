@@ -91,8 +91,9 @@
                 ".xx"
             ]
         },
-        "Banner": {
-            "banner": "Example Banner"
+         "Banner": {
+            "21": "421 Monthly usage quota for your IP address exceeded.",
+            "22": ""
         },
         "Known VPN": {
             "provider": "ExampleVPN",
@@ -144,7 +145,12 @@
                 "extra": {
                     "fullname": "",
                     "username": "example_user",
-                    "emails": []
+                    "emails": {
+                        "example@email.com": {
+                            "email": "example@email.com",
+                            "name": "example user"
+                        }
+                    }
                 }
             },
             "https://www.snapchat.com/add/example_user": {
