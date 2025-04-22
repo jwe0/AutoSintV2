@@ -183,7 +183,9 @@ class Main:
             "Online" : {},
             "Phone" : {},
             "Images" : {
-                "Misc" : []
+                "Misc" : {
+                    "Profile" : []
+                }   
             }
         }
 

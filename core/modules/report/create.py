@@ -119,15 +119,15 @@ def dirs(json_data):
     images = json_data["Images"]
     print("Downloading images...")
     for image in images:
-        if not os.path.exists("reports/{}/media/images/{}".format(id, image)):
-            os.mkdir("reports/{}/media/images/{}".format(id, image))
-        for img in images[image]:
-            try:
+        if not os.path.exists(f"reports/{id}/media/images/{image}"):
+            os.mkdir(f"reports/{id}/media/images/{image}")
+        for album in images[image]:
+            if not os.path.exists(f"reports/{id}/media/images/{image}/{album}"):
+                os.mkdir(f"reports/{id}/media/images/{image}/{album}")
+            for img in images[image][album]:
                 r = requests.get(img)
-                name = "".join(random.choices(string.ascii_letters + string.digits, k=15))
-                extension = find_ext(img)
-                with open(f"reports/{id}/media/images/{image}/{name}.{extension}", "wb") as f:
+                name = "".join(random.choices(string.ascii_letters + string.digits, k=10))
+                ext = find_ext(img)
+                with open(f"reports/{id}/media/images/{image}/{album}/{name}.{ext}", "wb") as f:
                     f.write(r.content)
-            except Exception as e:
-                print("Error downloading image: {}".format(e))
     create(json_data, id)

@@ -41,7 +41,7 @@ class Other_Methods:
                     description = main["description"]
                     image = main["image"]
                     if image:
-                        self.external_self.report["Images"]["Misc"].append(image)
+                        self.external_self.report["Images"]["Misc"]["Profile"].append(image)
 
                     datax["name"] = name
                     datax["alternatenames"] = alternatenames
@@ -97,7 +97,9 @@ class Other_Methods:
 
             return datax
     def fansly(self, username):
-        self.external_self.report["Images"]["Fansly"] = []
+        self.external_self.report["Images"]["Fansly"] = {
+            "Profile": []
+        }
         def provider_decode(id):
             table = {
                 1: "Twitter",
@@ -121,7 +123,7 @@ class Other_Methods:
                         continue
                     for l in locations:
                         url = l.get("location")
-                        self.external_self.report["Images"]["Fansly"].append(url)
+                        self.external_self.report["Images"]["Fansly"]["Profile"].append(url)
         result = {}
         api = "https://apiv3.fansly.com/api/v1/account?usernames={}&ngsw-bypass=true".format(username)
         headers = {
@@ -169,19 +171,19 @@ class Other_Methods:
                     if avatar:
                         avatar = avatar.get("variants")
                     if avatar:
-                        result["avatar"] = []
+                        self.external_self.report["Images"]["Fansly"]["Avatar"] = []
                         for a in avatar:
                             location = a.get("locations")[0].get("location")
-                            self.external_self.report["Images"]["Fansly"].append(location)
+                            self.external_self.report["Images"]["Fansly"]["Avatar"].append(location)
 
                     banner = response.get("banner")
                     if banner:
                         banner = banner.get("variants")
                     if banner:
-                        result["banner"] = []
+                        self.external_self.report["Images"]["Fansly"]["Banner"] = []
                         for b in banner:
                             location = b.get("locations")[0].get("location")
-                            self.external_self.report["Images"]["Fansly"].append(location)
+                            self.external_self.report["Images"]["Fansly"]["Banner"].append(location)
 
 
                     get_images(id)
@@ -194,7 +196,8 @@ class Other_Methods:
                 return {"error": "No response"}
         return result
 class Extra:
-    def __init__(self, session):
+    def __init__(self, session, external_self):
+        self.external_self = external_self
         self.session = session
 
     def github(self, username):
@@ -318,6 +321,43 @@ class Extra:
     
     def pornhub2(self, username):
         result = {}
+        def photos(username):
+            self.external_self.report["Images"]["Pornhub"] = {}
+            info = {
+                "Albums" : {},
+            }
+            url = "https://www.pornhub.com/model/{}/photos/public".format(username)
+            response = self.session.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+
+                photo_albums = soup.find("ul", class_="photosAlbumsListing")
+                if photo_albums:
+                    albums = photo_albums.find_all("li")
+                    if albums:
+                        for album in albums:
+                            a = album.find("a", href=True).get("href")
+                            title = album.find("div", class_="title-album")
+                            if title:
+                                title = title.get_text().strip()
+                            info["Albums"][title] = "https://www.pornhub.com{}".format(a)
+
+                for album in info["Albums"]:
+                    self.external_self.report["Images"]["Pornhub"][album] = []
+                    url = info["Albums"][album]
+                    response = self.session.get(url)
+                    if response.status_code == 200:
+                        soup = BeautifulSoup(response.text, "html.parser")
+                        photo_block_box = soup.find("div", class_="photoBlockBox")
+                        photos_list = photo_block_box.find("ul")
+                        photos = photos_list.find_all("li")
+                        for photo in photos:
+                            div = photo.find("div")
+                            if div:
+                                url = div.get("data-bkg")
+                                self.external_self.report["Images"]["Pornhub"][album].append(url)
+
+            return info
         def more_info(username):
             info_ = {}
             url = "https://www.pornhub.com/model/{}/about".format(username)
@@ -347,7 +387,7 @@ class Extra:
                             title = span.get_text().strip()
 
                             result["socials"][title] = a.get("href").strip()
-
+            result["photos"] = photos(username)
             return info_
         def achievments(username):
             result = []
@@ -441,7 +481,7 @@ class UsernameLookup:
         self.prog     = 0
         self.username = username
         self.session  = session
-        self.extra    = Extra(self.session)
+        self.extra    = Extra(self.session, self.external_self)
         
     def check(self, type, value, url):
         try:
