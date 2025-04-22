@@ -182,7 +182,9 @@ class Main:
             "Location" : {},
             "Online" : {},
             "Phone" : {},
-            "Images" : []
+            "Images" : {
+                "Misc" : []
+            }
         }
 
     def setup(self):

@@ -41,7 +41,7 @@ class Other_Methods:
                     description = main["description"]
                     image = main["image"]
                     if image:
-                        self.external_self.report["Images"].append(image)
+                        self.external_self.report["Images"]["Misc"].append(image)
 
                     datax["name"] = name
                     datax["alternatenames"] = alternatenames
@@ -97,12 +97,31 @@ class Other_Methods:
 
             return datax
     def fansly(self, username):
+        self.external_self.report["Images"]["Fansly"] = []
         def provider_decode(id):
             table = {
                 1: "Twitter",
                 4: "Instagram"
             }
             return table.get(int(id))
+        def get_images(id):
+            api = "https://apiv3.fansly.com/api/v1/timelinenew/{}?ngsw-bypass=false".format(id)
+            
+            r = requests.get(api)
+            if r.status_code != 200:
+                return
+            data = r.json()
+            
+            main = data.get("response").get("accountMedia")
+            for media in main:
+                sub = media.get("preview").get("variants")
+                for s in sub:
+                    locations = s.get("locations")
+                    if not locations:
+                        continue
+                    for l in locations:
+                        url = l.get("location")
+                        self.external_self.report["Images"]["Fansly"].append(url)
         result = {}
         api = "https://apiv3.fansly.com/api/v1/account?usernames={}&ngsw-bypass=true".format(username)
         headers = {
@@ -153,7 +172,7 @@ class Other_Methods:
                         result["avatar"] = []
                         for a in avatar:
                             location = a.get("locations")[0].get("location")
-                            self.external_self.report["Images"].append(location)
+                            self.external_self.report["Images"]["Fansly"].append(location)
 
                     banner = response.get("banner")
                     if banner:
@@ -162,7 +181,11 @@ class Other_Methods:
                         result["banner"] = []
                         for b in banner:
                             location = b.get("locations")[0].get("location")
-                            self.external_self.report["Images"].append(location)
+                            self.external_self.report["Images"]["Fansly"].append(location)
+
+
+                    get_images(id)
+                            
                     return result
                 
                 else:

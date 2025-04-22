@@ -30,5 +30,5 @@ def show(data):
             func_info = sec_info[func]
             if func_info:
                 if isinstance(func_info, dict):
-                    message += flatten(func_info)
+                    message += flatten(func_info)   
     print(message)
