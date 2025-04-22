@@ -408,8 +408,7 @@ class UsernameLookup:
             else:
                 self.report[site] = {
                     "site": site,
-                    "result": self.result[site],
-                    "extra": None
+                    "result": self.result[site]
                 }
     def start(self):
         for site in self.sites:

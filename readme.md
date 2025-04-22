@@ -211,3 +211,5 @@
     }
 }
 ```
+## Disclaimer
+This script does perform web scraping. This script also does attempt to visit NSFW websites in order to scrape information, be warned that when using this on a public network or a closely monitored network this traffic may appear and might be flagged, you have been warned.

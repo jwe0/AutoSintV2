@@ -189,11 +189,6 @@
         "type": "status-code",
         "check-value": 200
     },
-    "8Tracks" : {
-        "url" : "https://8tracks.com/{}",
-        "type" : "site-content",
-        "check-value" : "This page has vanished"
-    },
     "All my links" : {
         "url" : "https://allmylinks.com/{}",
         "type" : "title-content",
@@ -211,8 +206,8 @@
     },
     "Ezbio" : {
         "url" : "https://e-z.bio/{}",
-        "type" : "site-content",
-        "check-value" : "Page not found"
+        "type" : "status-code",
+        "check-value" : 200
     },
     "PornHubModel" : {
         "url" : "https://www.pornhub.com/model/{}",
