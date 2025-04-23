@@ -68,7 +68,7 @@ class Main:
             {
                 "name" : "Email",
                 "arg" : "Email",
-                "format" : "something@provider.tld",
+                "format" : "something@provider.tld (if multiple seperate with ,)",
                 "funcs" : [
                     {
                         "name" : "Intelx",
